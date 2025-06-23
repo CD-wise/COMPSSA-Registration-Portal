@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* ---------- Admins ---------- */
+    match /admins/{uid} {
+      // Allow users to read their own admin profile
+      allow read: if request.auth != null && request.auth.uid == uid;
+      
+      // Allow any authenticated user to read admin profiles (needed for role checking)
+      allow read: if request.auth != null;
+      
+      // Only the President can create/update/delete admin accounts
+      allow write: if
+        request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'president';
+    }
+
+    /* ---------- Registrations ---------- */
+    match /registrations/{docId} {
+      // Allow any authenticated admin to read all registrations
+      allow read: if 
+        request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+
+      // Allow any authenticated admin to create registrations
+      allow create: if
+        request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+        request.resource.data.collectedByUid == request.auth.uid;
+
+      // Allow updates based on role and ownership
+      allow update: if request.auth != null && (
+          // Financial officer or president can update financial validation
+          ((get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'financial_officer' ||
+            get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'president') &&
+           request.resource.data.diff(resource.data).keys().hasOnly(['financialValidation']))
+        || 
+          // President can update anything
+          (get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'president')
+        || 
+          // Original collector can update their own registrations
+          (resource.data.collectedByUid == request.auth.uid)
+      );
+
+      // Allow deletion by original collector or president
+      allow delete: if request.auth != null && (
+          (resource.data.collectedByUid == request.auth.uid) ||
+          (get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'president')
+      );
+    }
+
+    /* ---------- Fallback: Deny all other access ---------- */
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
