@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
   <div class="container">
       <div class="header">
           <div class="logo">
-              <img src="https://your-domain.com/compssa-logo.png" alt="COMPSSA Logo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: contain;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'width: 100px; height: 100px; border: 2px solid #16a34a; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: #16a34a; font-size: 24px; font-weight: bold;\\'>CPS</div>';">
+              <img src="https://compssa-registration-portal.vercel.app/compssa-logo.png" alt="COMPSSA Logo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: contain;" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'width: 100px; height: 100px; border: 2px solid #16a34a; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: #16a34a; font-size: 24px; font-weight: bold;\\'>CPS</div>';">
           </div>
           <h1 class="title">COMPSSA</h1>
           <p class="subtitle">Computer Science Department Registration</p>
